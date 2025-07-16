@@ -1,0 +1,37 @@
+import express from 'express';
+import dotenv from 'dotenv';
+
+// Load environment variables FIRST before any other imports
+dotenv.config({ path: `.env.${process.env.NODE_ENV || 'development'}` });
+
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpecs } from './shared/config/swaggerConfig';
+
+// Initialize Firebase
+import './shared/config/firebaseConfig';
+
+const app = express();
+app.use(express.json());
+
+import productRoutes from './modules/products/routes/productRoutes';
+import categoryRoutes from './modules/categories/routes/categoryRoutes';
+import charityRoutes from './modules/charities/routes/charityRoutes';
+import authRoutes from './modules/auth/routes/authRoutes';
+
+app.use('/api/products', productRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/charities', charityRoutes);
+app.use('/api/auth', authRoutes);
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
+
+// 404 handler
+app.use('*', (req, res) => {
+    res.status(404).json({
+        success: false,
+        message: 'Route not found',
+        path: req.originalUrl
+    });
+});
+
+export default app;
