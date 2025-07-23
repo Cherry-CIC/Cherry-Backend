@@ -19,6 +19,7 @@ const router = Router();
  *       type: object
  *       required:
  *         - name
+ *         - description
  *         - imageUrl
  *       properties:
  *         id:
@@ -27,10 +28,17 @@ const router = Router();
  *         name:
  *           type: string
  *           description: The name of the charity
+ *         description:
+ *           type: string
+ *           description: A detailed description of the charity
  *         imageUrl:
  *           type: string
  *           format: uri
  *           description: The image URL of the charity
+ *         website:
+ *           type: string
+ *           format: uri
+ *           description: The website URL of the charity (optional)
  *         createdAt:
  *           type: string
  *           format: date-time
@@ -42,7 +50,9 @@ const router = Router();
  *       example:
  *         id: "charity123"
  *         name: "Red Cross"
+ *         description: "The International Federation of Red Cross and Red Crescent Societies is a worldwide humanitarian aid organization."
  *         imageUrl: "https://example.com/redcross.jpg"
+ *         website: "https://www.redcross.org"
  *         createdAt: "2023-01-01T00:00:00.000Z"
  *         updatedAt: "2023-01-01T00:00:00.000Z"
  */
@@ -125,16 +135,24 @@ router.get('/:id', validateCharityId, getCharityById);
  *             type: object
  *             required:
  *               - name
+ *               - description
  *               - imageUrl
  *             properties:
  *               name:
  *                 type: string
+ *               description:
+ *                 type: string
  *               imageUrl:
+ *                 type: string
+ *                 format: uri
+ *               website:
  *                 type: string
  *                 format: uri
  *             example:
  *               name: "UNICEF"
+ *               description: "UNICEF works in over 190 countries and territories to save children's lives, to defend their rights, and to help them fulfill their potential."
  *               imageUrl: "https://example.com/unicef.jpg"
+ *               website: "https://www.unicef.org"
  *     responses:
  *       201:
  *         description: Charity created successfully
@@ -176,12 +194,19 @@ router.post('/', validateCharity, createCharity);
  *             properties:
  *               name:
  *                 type: string
+ *               description:
+ *                 type: string
  *               imageUrl:
+ *                 type: string
+ *                 format: uri
+ *               website:
  *                 type: string
  *                 format: uri
  *             example:
  *               name: "Updated UNICEF"
+ *               description: "Updated description for UNICEF's mission and activities worldwide."
  *               imageUrl: "https://example.com/updated-unicef.jpg"
+ *               website: "https://www.unicef.org"
  *     responses:
  *       200:
  *         description: Charity updated successfully

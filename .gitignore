@@ -134,6 +134,7 @@ lerna-debug.log*
 .firebase/
 firebase-debug.log
 .firebaserc
+**/serviceAccount.json
 
 # Temporary folders
 tmp/
