@@ -1,6 +1,6 @@
 # Cherry Backend
 
-A Node.js/TypeScript backend API Built with Express.js and Firebase.
+A Node.js/TypeScript cherry backend API Built with Express.js and Firebase.
 
 ```
 src/
