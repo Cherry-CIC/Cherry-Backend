@@ -1,4 +1,4 @@
-# Cherry Backend
+# cherry Backend
 
 A Node.js/TypeScript cherry backend API Built with Express.js and Firebase to power the Cherry Mobile App: https://github.com/Cherry-CIC/MVP
 
