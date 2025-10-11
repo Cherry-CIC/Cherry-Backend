@@ -149,9 +149,23 @@ export class ProductService {
     }
 
     async deleteProduct(id: string): Promise<boolean> {
-        return this.productRepo.delete(id);
+      return this.productRepo.delete(id);
     }
-
+  
+    /**
+     * Adjust the product's likes/points by a signed delta.
+     * Positive delta increments, negative delta decrements.
+     */
+    async changePoints(id: string, delta: number): Promise<Product | null> {
+      // Ensure the product exists
+      const product = await this.productRepo.getById(id);
+      if (!product) {
+        return null;
+      }
+      // Delegate to repository's atomic adjustLikes method
+      return this.productRepo.adjustLikes(id, delta);
+    }
+  
     private async validateReferences(categoryId: string, charityId: string): Promise<void> {
         const [category, charity] = await Promise.all([
             this.categoryRepo.getById(categoryId),

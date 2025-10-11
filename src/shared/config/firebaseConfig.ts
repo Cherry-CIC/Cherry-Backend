@@ -1,51 +1,44 @@
 import { initializeApp, cert } from 'firebase-admin/app';
-import { initializeApp as initializeClientApp } from 'firebase/app';
-import { getFirestore } from 'firebase-admin/firestore';
 import * as admin from 'firebase-admin';
+import { getFirestore } from 'firebase-admin/firestore';
+import { initializeApp as initializeClientApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 
-const firebaseConfig = {
-    apiKey: process.env.FIREBASE_API_KEY,
-    authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.FIREBASE_APP_ID,
-    measurementId: process.env.FIREBASE_MEASUREMENT_ID
+// Firebase client SDK config (used for auth on the client side)
+const firebaseClientConfig = {
+  apiKey: process.env.FIREBASE_API_KEY,
+  // authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  // storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+  // messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+  // appId: process.env.FIREBASE_APP_ID,
 };
 
-const clientApp = initializeClientApp(firebaseConfig);
+// Initialise client app (for client‑side Auth utilities)
+const clientApp = initializeClientApp(firebaseClientConfig);
 
-// Initialize Firebase Admin SDK
-if (process.env.NODE_ENV === 'production') {
-    // In Cloud Run, use Application Default Credentials (ADC)
-    initializeApp({
-        projectId: process.env.FIREBASE_PROJECT_ID,
-    });
-} else {
-    // For local development, use environment variables
-    if (process.env.FIREBASE_PRIVATE_KEY && process.env.FIREBASE_CLIENT_EMAIL) {
-        initializeApp({
-            credential: cert({
-                projectId: process.env.FIREBASE_PROJECT_ID,
-                clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-                privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-            }),
-        });
-    } else {
-        console.error('Firebase credentials not found. Please set FIREBASE_PRIVATE_KEY and FIREBASE_CLIENT_EMAIL environment variables.');
-        throw new Error('Firebase credentials not configured');
-    }
+// Initialise Admin SDK (for server‑side Firestore & Auth)
+// Use full service‑account credentials from .env. Cast to any to avoid strict type errors.
+if (!admin.apps.length) {
+  // @ts-ignore
+  initializeApp({
+    credential: cert({
+      type: process.env.FIREBASE_TYPE,
+      project_id: process.env.FIREBASE_PROJECT_ID,
+      private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
+      private_key: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+      client_email: process.env.FIREBASE_CLIENT_EMAIL,
+      client_id: process.env.FIREBASE_CLIENT_ID,
+      auth_uri: process.env.FIREBASE_AUTH_URI,
+      token_uri: process.env.FIREBASE_TOKEN_URI,
+      auth_provider_x509_cert_url: process.env.FIREBASE_AUTH_PROVIDER_CERT_URL,
+      client_x509_cert_url: process.env.FIREBASE_CLIENT_CERT_URL,
+      universe_domain: process.env.FIREBASE_UNIVERSE_DOMAIN,
+    } as any),
+  });
 }
 
-const firestore = getFirestore();
-
-// Configure Firestore settings to ignore undefined properties
-firestore.settings({
-    ignoreUndefinedProperties: true
-});
-
-const clientAuth = getAuth(clientApp);
-
-// @ts-ignore
-export { admin, firestore, clientAuth };
+// Export commonly used Firebase objects
+export const firestore = getFirestore();
+export const clientAuth = getAuth(clientApp);
+export { admin };

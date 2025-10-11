@@ -76,17 +76,6 @@ export const getAllProductsWithDetails = async (req: Request, res: Response): Pr
     }
 };
 
-export const getMyProducts = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const productService = ServiceFactory.getProductService();
-        const user = (req as any).user;
-        const products = await productService.getProductsByUserId(user.uid);
-        ResponseHandler.success(res, products, 'User products fetched successfully');
-    } catch (err) {
-        ResponseHandler.internalServerError(res, 'Failed to fetch user products', err instanceof Error ? err.message : 'Unknown error');
-    }
-};
-
 export const updateProduct = async (req: Request, res: Response): Promise<void> => {
     try {
         const productService = ServiceFactory.getProductService();
@@ -140,4 +129,32 @@ export const deleteProduct = async (req: Request, res: Response): Promise<void> 
     } catch (err) {
         ResponseHandler.internalServerError(res, 'Failed to delete product', err instanceof Error ? err.message : 'Unknown error');
     }
+};
+export const likeProduct = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const productService = ServiceFactory.getProductService();
+    const { id } = req.params;
+    const { like } = req.body;
+
+    if (typeof like !== 'boolean') {
+      ResponseHandler.badRequest(res, 'Like must be a boolean (true to like, false to unlike)');
+      return;
+    }
+
+    // Convert the boolean 'like' flag to a numeric delta (+1 for like, -1 for unlike)
+    const delta = like ? 1 : -1;
+    const product = await productService.changePoints(id, delta);
+    if (!product) {
+      ResponseHandler.notFound(res, 'Product not found', `Product with ID ${id} does not exist`);
+      return;
+    }
+
+    ResponseHandler.success(res, product, 'Product likes updated successfully');
+  } catch (err) {
+    ResponseHandler.internalServerError(
+      res,
+      'Failed to update product likes',
+      err instanceof Error ? err.message : 'Unknown error'
+    );
+  }
 };
