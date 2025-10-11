@@ -2,7 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 
 // Load environment variables FIRST before any other imports
-dotenv.config({ path: `.env.${process.env.NODE_ENV || 'development'}` });
+dotenv.config({ path: '.env' });
 
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpecs } from './shared/config/swaggerConfig';
@@ -17,11 +17,15 @@ import productRoutes from './modules/products/routes/productRoutes';
 import categoryRoutes from './modules/categories/routes/categoryRoutes';
 import charityRoutes from './modules/charities/routes/charityRoutes';
 import authRoutes from './modules/auth/routes/authRoutes';
+import paymentRoutes from './modules/payment/routes/paymentRoutes';
+import orderRoutes from './modules/order/routes/orderRoutes';
 
 app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/charities', charityRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/payment', paymentRoutes);
+app.use('/api/order', orderRoutes);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 

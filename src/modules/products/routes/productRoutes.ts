@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import {
-    getAllProducts,
-    createProduct,
-    getProductById,
-    getProductWithDetails,
-    getAllProductsWithDetails,
-    updateProduct,
-    deleteProduct,
-    getMyProducts
+  getAllProducts,
+  createProduct,
+  getProductById,
+  getProductWithDetails,
+  getAllProductsWithDetails,
+  updateProduct,
+  deleteProduct,
+  likeProduct
 } from '../controllers/productController';
 import { validateProduct } from '../validators/productValidator';
 import { validateProductId } from '../validators/productIdValidator';
@@ -592,7 +592,62 @@ router.delete('/:id', authMiddleware, validateProductId, deleteProduct);
  *       500:
  *         description: Server error
  */
-router.get('/my-products', authMiddleware, getMyProducts);
+/**
+ * @swagger
+ * /api/products/{id}/like:
+ *   post:
+ *     summary: Like or unlike a product
+ *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Product ID
+ *         example: "dePrjBhBLclqdWE0m9SP"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - like
+ *             properties:
+ *               like:
+ *                 type: boolean
+ *                 description: true to like, false to unlike
+ *                 example: true
+ *     responses:
+ *       200:
+ *         description: Like status updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Product liked successfully"
+ *                 data:
+ *                   $ref: '#/components/schemas/Product'
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ *       400:
+ *         description: Bad request (e.g., missing like flag)
+ *       404:
+ *         description: Product not found
+ *       500:
+ *         description: Server error
+ */
+router.post('/:id/like', authMiddleware, likeProduct);
 
 export default router;
 

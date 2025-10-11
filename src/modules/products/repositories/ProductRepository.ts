@@ -126,4 +126,27 @@ export class ProductRepository {
             } as Product;
         });
     }
+  /**
+   * Adjust the likes count by a signed delta.
+   * Guarantees the likes never go below zero.
+   */
+  async adjustLikes(id: string, delta: number): Promise<Product | null> {
+    const docRef = this.db.collection(this.collectionName).doc(id);
+    const doc = await docRef.get();
+
+    if (!doc.exists) {
+      return null;
+    }
+
+    const data = doc.data() as Product;
+    const currentLikes = typeof data.likes === 'number' ? data.likes : 0;
+    const newLikes = Math.max(0, currentLikes + delta);
+
+    await docRef.update({
+      likes: newLikes,
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+
+    return this.getById(id);
+  }
 }
