@@ -1,7 +1,6 @@
 import * as dotenv from 'dotenv';
 
-// Load environment variables from environment-specific .env file
-dotenv.config({ path: `.env.${process.env.NODE_ENV || 'development'}` });
+dotenv.config({ path: '.env' });
 
 import app from './app';
 
